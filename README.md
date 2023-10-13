@@ -32,7 +32,7 @@ Your lexer shall classify each lexeme found in a given source file into one of 8
 * a single space appears between each lexeme and its classification
 * the classification appears in parentheses.
 ````
-/* 
+/*
 * Hello world with args. 
 */ (comment) 
 procedure (keyword) 
