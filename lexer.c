@@ -51,9 +51,9 @@ so it returns true if there is a difference and false if there isn't a differenc
 we use !strcmp() rather than strcmp().We need strcmp() because comparing strings with the == operator would 
 give a comparison of their object references rather than their literal values. */
 
-    if (!strcmp(s, "accessor") || !strcmp(s, "and") ||
-        !strcmp(s, "array") || !strcmp(s, "begin") ||
-        !strcmp(s, "bool") || !strcmp(s, "case") 
+    if (!strcmp(s, "accessor") || !strcmp(s, "and")
+     || !strcmp(s, "array") || !strcmp(s, "begin")
+        || !strcmp(s, "bool") || !strcmp(s, "case") 
         || !strcmp(s, "character")|| !strcmp(s, "constant") 
         || !strcmp(s, "else")|| !strcmp(s, "elseif") 
         || !strcmp(s, "end") || !strcmp(s, "exit") 
@@ -117,7 +117,7 @@ bool isOperator(char ch)
 
     // }
 // }
-
+/*
 void parseLine(char* line, FILE* outfile)
 {
     static int inComment=0;
@@ -193,7 +193,7 @@ void parseLine(char* line, FILE* outfile)
     //    else if(isString(line[i]) == true){
     //         printf("%s (string)\n", token);
     //     }
-        /*
+        
         else if(isCharacter(line[i]) == true){
             printf("%s (character literal)\n", token);
         }
@@ -214,7 +214,7 @@ void parseLine(char* line, FILE* outfile)
             else{
                 printf("%s (identifier)\n", token);
             }
-        }*/
+        }
         else if(isspace(line[i])){
             if(i>=size){
                 return;
@@ -234,21 +234,79 @@ void parseLine(char* line, FILE* outfile)
         }
     }
 }
+*/
 
-void readFile(char* file)
+int getString(FILE* outFile, char* linePar, int pos)
+{
+    while(linePar[pos] != '"'&& pos <strlen(linePar)){
+        fprintf(outFile, "%c", linePar[pos]);
+        pos++;
+    }
+    //found another "
+    if (linePar[pos] == '"' && pos <strlen(linePar))
+    {
+        fprintf(outFile, "%c (string)\n", linePar[pos]);
+        pos++;
+        return pos;
+
+    }else{//should nevere happend 
+        printf("something is wrong");
+        exit(1);
+    }
+}
+
+void parseLine(char* line, FILE* outfile){
+    int i =0;
+    int size = strlen(line);
+    while(isspace(line[i])){
+        i++;
+    } 
+    while(i<size){
+        if(line[i] == '"'){
+            fprintf(outfile, "%c", line[i]);
+            i++;
+            i = getString(outfile, line, i);
+        }
+        else if(isspace(line[i])){
+            fprintf(outfile, " (UNK)\n");
+            // fflush(outfile);
+            i++;
+            while(isspace(line[i])){
+                i++;
+            }          
+        }else{
+            fprintf(outfile, "%c", line[i]);
+            i++;
+        }
+    }
+
+}
+void readFile(const char* file)
 {
     // FILE *fptr;
-    int fvar;
+    //int fvar;
     FILE *outfile;
     outfile = fopen("output.txt", "w");
+    if (outfile ==NULL){
+        printf("Error opening output file");
+        exit(1);
+    } 
     char buffer[1000];
 
-    fvar = open(file, O_RDONLY);
-    // fptr = open(file, 'r');
+    //fvar = open(file, O_RDONLY);
+    FILE * fptr;
+    fptr = fopen(file, "r");
+    if (fptr ==NULL){
+        printf("Error opening input file");
+        exit(1);
+    } 
 
     /* This was a while loop previously and it was throwing an infinity loop. Eventually I figured out that I can 
      fix this by changing the while to an if.*/
-    if(read(fvar,buffer, 1000) != EOF)
+
+     // Figure out later how to make while loop without displaying file infinite times
+    while(fgets(buffer, 1000, fptr))
+    //if(read(fvar,buffer, 1000) != EOF)
     {   
         printf("Call parseLine\n"); 
         // fflush(stdout);   

@@ -3,8 +3,8 @@ int main()
 {
     // Use these readFile calls for testing
 
-    readFile("./files/hello_world.ccx");
-    // readFile("./files/list.cci");
+    // readFile("./files/hello_world.ccx");
+    readFile("./files/list.cci");
     // readFile("./files/list.ccx");
     // readFile("./files/complex.cci");
     // readFile("./files/complex.ccx");

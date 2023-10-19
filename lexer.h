@@ -9,7 +9,7 @@
      #include <unistd.h>
      #include <fcntl.h>
 
-void readFile(char* file);
+void readFile(const char* file);
 // bool startOfComment(char* s);
 // bool midComment(char* s);
 // bool endOfComment(char* s);
@@ -20,4 +20,4 @@ void readFile(char* file);
 
 void parseLine(char* line, FILE * outfile);
 void parseString(char* s, FILE * outfile);
-
+int getString(FILE* filePar, char* linePar, int pos);
