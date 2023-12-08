@@ -60,7 +60,7 @@ give a comparison of their object references rather than their literal values. *
         || !strcmp(s, "function") || !strcmp(s, "if") 
         || !strcmp(s, "in")|| !strcmp(s, "integer") 
         || !strcmp(s, "interface")|| !strcmp(s, "is") 
-        || !strcmp(s, "loop") || !strcmp(s, "module")
+        || !strcmp(s, "loop") || !strcmp(s, "module ")
         || !strcmp(s, "mutator") || !strcmp(s, "natural") 
         || !strcmp(s, "null") || !strcmp(s, "of")
         || !strcmp(s, "or") || !strcmp(s, "other")
@@ -88,9 +88,7 @@ bool isOperator(char ch)
 {
     if (ch == '.' || ch == '<' || ch == '>' || ch == '(' || ch == ')' 
     || ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '|' 
-    || ch == '&' || ch == ';' || ch == ',' 
-    // || ch == ':'
-    || ch == '[' || ch == ']' || ch == '='
+    || ch == '&' || ch == ';' || ch == ',' || ch == ':' || ch == '[' || ch == ']' || ch == '='
     //  || ch == ':=' || ch == '..' || ch == '<<' || ch = '>>' || ch == '<>' || 
     // ch == '<=' || ch == '>=' || ch == '**' || ch == '!= ' || ch == '=>'
     ){
@@ -100,6 +98,112 @@ bool isOperator(char ch)
         return false;
     }
 }
+
+int getString(FILE* outFile, char* linePar, int pos)
+{
+    while(linePar[pos] != '"'&& pos <strlen(linePar)){
+        fprintf(outFile, "%c", linePar[pos]);
+        pos++;
+    }
+    //found another "
+    if (linePar[pos] == '"' && pos <strlen(linePar))
+    {
+        fprintf(outFile, "%c (string)\n", linePar[pos]);
+        pos++;
+        return pos;
+
+    }else{//should never happen
+        printf("something is wrong");
+        exit(1);
+    }
+}
+
+void parseLine(char* line, FILE* outfile){
+    int i =0;
+    int size = strlen(line);
+    while(isspace(line[i])){
+        i++;
+    } 
+    while(i<size){
+        if(line[i] == '"'){
+            fprintf(outfile, "%c", line[i]);
+            i++;
+            i = getString(outfile, line, i);
+                while(isspace(line[i])){
+                i++;
+            } 
+        }
+        // This was an attempt to locate identifiers
+        // else if(isalpha(line[0])){
+        //     fprintf(outfile, " Identifier\n");
+        //     i++;
+        // }
+        else if(isKeyword(line)){
+            fprintf(outfile, " (Keyword)\n");
+            i++;
+        }
+        // else if(isdigit(line[i])){
+        //     fprintf(outfile, " (numeric literal)\n");
+        //     i++;
+        // }
+
+        else if(isOperator(line[i-1])){
+            fprintf(outfile, " (Operator)\n");
+            i++;
+        }
+    else if(isspace(line[i])){
+            fprintf(outfile, " (UNK)\n");
+            i++;
+        //     while(isspace(line[i])){
+        //         i++;
+        // }          
+        }else{
+            fprintf(outfile, "%c", line[i]);
+            i++;
+        }
+}
+}
+
+void readFile(const char* file)
+{
+    // FILE *fptr;
+    //int fvar;
+    FILE *outfile;
+    outfile = fopen("output.txt", "w");
+    if (outfile ==NULL){
+        printf("Error opening output file");
+        exit(1);
+    } 
+    char buffer[1000];
+
+    //fvar = open(file, O_RDONLY);
+    FILE * fptr;
+    fptr = fopen(file, "r");
+    if (fptr ==NULL){
+        printf("Error opening input file");
+        exit(1);
+    } 
+
+    /* This was a while loop previously and it was throwing an infinity loop. Eventually I figured out that I can 
+     fix this by changing the while to an if.*/
+
+     // Figure out later how to make while loop without displaying file infinite times
+    while(fgets(buffer, 1000, fptr))
+    //if(read(fvar,buffer, 1000) != EOF)
+    {   
+        printf("Call parseLine\n"); 
+        // fflush(stdout);   
+        parseLine(buffer, outfile);       
+    }
+    // fclose(fvar);
+}
+
+/* More about the difference between read() and fgets():
+https://stackoverflow.com/questions/6220093/difference-between-read-and-fgets-in-c
+https://stackoverflow.com/questions/5436193/read-up-to-a-null-terminator-using-read
+*/
+
+
 /* Operators: “.”   “<”   “>”   “(“   “)”  “+”   “-“   “*”   
 “/”   “|”   “&”   “;”   “,”   “:” “[“   “]”  “=”   “:=”   “..”  
 “<<”   “>>”   “<>”   “<=”   “>=”   “**”   “!=”   “=>”*/
@@ -234,88 +338,4 @@ void parseLine(char* line, FILE* outfile)
         }
     }
 }
-*/
-
-int getString(FILE* outFile, char* linePar, int pos)
-{
-    while(linePar[pos] != '"'&& pos <strlen(linePar)){
-        fprintf(outFile, "%c", linePar[pos]);
-        pos++;
-    }
-    //found another "
-    if (linePar[pos] == '"' && pos <strlen(linePar))
-    {
-        fprintf(outFile, "%c (string)\n", linePar[pos]);
-        pos++;
-        return pos;
-
-    }else{//should nevere happend 
-        printf("something is wrong");
-        exit(1);
-    }
-}
-
-void parseLine(char* line, FILE* outfile){
-    int i =0;
-    int size = strlen(line);
-    while(isspace(line[i])){
-        i++;
-    } 
-    while(i<size){
-        if(line[i] == '"'){
-            fprintf(outfile, "%c", line[i]);
-            i++;
-            i = getString(outfile, line, i);
-        }
-        else if(isspace(line[i])){
-            fprintf(outfile, " (UNK)\n");
-            // fflush(outfile);
-            i++;
-            while(isspace(line[i])){
-                i++;
-            }          
-        }else{
-            fprintf(outfile, "%c", line[i]);
-            i++;
-        }
-    }
-
-}
-void readFile(const char* file)
-{
-    // FILE *fptr;
-    //int fvar;
-    FILE *outfile;
-    outfile = fopen("output.txt", "w");
-    if (outfile ==NULL){
-        printf("Error opening output file");
-        exit(1);
-    } 
-    char buffer[1000];
-
-    //fvar = open(file, O_RDONLY);
-    FILE * fptr;
-    fptr = fopen(file, "r");
-    if (fptr ==NULL){
-        printf("Error opening input file");
-        exit(1);
-    } 
-
-    /* This was a while loop previously and it was throwing an infinity loop. Eventually I figured out that I can 
-     fix this by changing the while to an if.*/
-
-     // Figure out later how to make while loop without displaying file infinite times
-    while(fgets(buffer, 1000, fptr))
-    //if(read(fvar,buffer, 1000) != EOF)
-    {   
-        printf("Call parseLine\n"); 
-        // fflush(stdout);   
-        parseLine(buffer, outfile);       
-    }
-    // fclose(fvar);
-}
-
-/* More about the difference between read() and fgets():
-https://stackoverflow.com/questions/6220093/difference-between-read-and-fgets-in-c
-https://stackoverflow.com/questions/5436193/read-up-to-a-null-terminator-using-read
 */

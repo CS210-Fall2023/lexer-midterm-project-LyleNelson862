@@ -15,7 +15,7 @@ void readFile(const char* file);
 // bool endOfComment(char* s);
 // bool isString(char* s);
 // bool isCharacter(char s);
-// bool isKeyword(char* s);
+bool isKeyword(char* s);
 // bool isOperator(char ch);
 
 void parseLine(char* line, FILE * outfile);
